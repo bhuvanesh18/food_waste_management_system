@@ -1,0 +1,99 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $venue_selector = `<div>
+                        <label for="register-venue" class="form-label">Venue</label>
+                        <select class="form-select" name="register-venue" id="register-venue" required>
+                            <option value="">Select venue</option>
+                            <option value="BOYS_DINING">Boys dining</option>
+                            <option value="GIRLS_DINING">Girls dining</option>
+                            <option value="DAYSCHOLARS_DINING">Dayscholars dining</option>
+                        </select>
+                    </div>`;
+        $('#register-role').change(function(){
+            if($('#register-role').val()=="MANAGER"){
+                $('#register-venue-feild').append($venue_selector);
+            }else{
+                $('#register-venue-feild').empty();
+            } 
+        });
+    });
+</script>
+<!-- login modal -->
+<div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" action="login.php">
+                <div class="mb-3">
+                    <label for="login-email" class="form-label">Email</label>
+                    <input type="email" class="form-control" name="login-email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="login-password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <div class="mb-3 text-center">
+                    <input type="submit" class="btn btn-success" name="login-submit" value="Submit"/>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer float-left">
+            Create a new user -<button class="btn btn-light text-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#register">click here</button>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- register modal -->
+<div class="modal fade" id="register" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Register here!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" action="register.php">
+                <div class="mb-3">
+                    <label for="register-name" class="form-label">Name</label>
+                    <input type="text" class="form-control" name="register-name" id="register-name" placeholder="Enter your name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="register-email" class="form-label">Email</label>
+                    <input type="email" class="form-control" name="register-email" id="register-email" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="register-password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="register-password" id="register-password" placeholder="Enter your password" minlength="6" required>
+                </div>
+                <div class="mb-3">
+                    <label for="register-repassword" class="form-label">Re-type Password</label>
+                    <input type="password" class="form-control" name="register-repassword" id="register-repassword" placeholder="Confrim your password" minlength="6" required>
+                </div>
+                <div class="mb-3">
+                    <label for="register-role" class="form-label">Role</label>
+                    <select class="form-select" name="register-role" id="register-role" required>
+                        <option value="">Select your role</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="MANAGER">MANAGER</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="register-venue-feild">
+
+                </div>
+                <div class="mb-3 text-center">
+                    <input type="submit" class="btn btn-success" name="register-submit" value="Submit"/>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            Already have an account -<button class="btn btn-light text-primary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#login">click here</button>
+        </div>
+    </div>
+    </div>
+</div>
