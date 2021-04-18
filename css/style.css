@@ -839,6 +839,8 @@
      background: transparent;
      padding: 0;
      border: none;
+     position: fixed;
+     right: 20px;
 }
  #sidebar .sidebar-header {
      padding: 20px;

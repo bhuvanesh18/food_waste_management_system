@@ -23,6 +23,13 @@
     }
     $venue_array["ALL"] = "ALL Dinings";
 
+    $institution_query = "SELECT institution_id, institution_name FROM institutions";
+    $institution_data = mysqli_query($conn, $institution_query);
+    $institution_array = [];
+    while($institution_result = mysqli_fetch_assoc($institution_data)){
+        $institution_array[$institution_result['institution_id']] = $institution_result['institution_name'];
+    }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +71,7 @@
                     if($_SESSION['role']=='SUPER_ADMIN'){
                         $query = "SELECT name, email, role, venue FROM users WHERE is_active=0 AND is_blocked=0";
                     }else if($_SESSION['role']=='ADMIN'){
-                        $query = "SELECT name, email, role, venue FROM users WHERE is_active=0 AND is_blocked=0 AND role='MANAGER'";
+                        $query = "SELECT name, email, role, venue FROM users WHERE is_active=0 AND is_blocked=0 AND role='MANAGER' AND institution_id = '$_SESSION[institution_id]'";
                     }
             
                     $data = mysqli_query($conn, $query);
@@ -119,7 +126,7 @@
                     if($_SESSION['role']=='SUPER_ADMIN'){
                         $query = "SELECT name, email, role, venue FROM users WHERE is_active=1 AND is_blocked=0 AND email!='$_SESSION[email]'";
                     }else if($_SESSION['role']=='ADMIN'){
-                        $query = "SELECT name, email, role, venue FROM users WHERE is_active=1 AND is_blocked=0 AND role='MANAGER' AND email!='$_SESSION[email]'";
+                        $query = "SELECT name, email, role, venue FROM users WHERE is_active=1 AND is_blocked=0 AND role='MANAGER' AND email!='$_SESSION[email]' AND institution_id = '$_SESSION[institution_id]'";
                     }
             
                     $data = mysqli_query($conn, $query);
@@ -169,7 +176,7 @@
                     if($_SESSION['role']=='SUPER_ADMIN'){
                         $query = "SELECT name, email, role, venue FROM users WHERE is_blocked=1";
                     }else if($_SESSION['role']=='ADMIN'){
-                        $query = "SELECT name, email, role, venue FROM users WHERE is_blocked=1 AND role='MANAGER'";
+                        $query = "SELECT name, email, role, venue FROM users WHERE is_blocked=1 AND role='MANAGER' AND institution_id = '$_SESSION[institution_id]'";
                     }
             
                     $data = mysqli_query($conn, $query);
@@ -277,7 +284,7 @@
                     <div class="tab-pane fade" id="overall-history" role="tabpanel" aria-labelledby="overall-history-tab">
                         <?php
                         $query = "SELECT id, requestor_name, requestor_email, temp_table.role as requestor_role, temp_table.venue as requestor_venue, action_taker_email, users.name as action_taker_name,
-                                 is_approved, action_logged_at from users INNER join (SELECT id, name as requestor_name, email as requestor_email, 
+                                 is_approved, action_logged_at, institution_id from users INNER join (SELECT id, name as requestor_name, email as requestor_email, 
                                  role, venue, action_by as action_taker_email, is_approved ,action_logged_at FROM users INNER JOIN users_log_status
                                 ON users_log_status.user_email = users.email) as temp_table on users.email = temp_table.action_taker_email ORDER BY id ASC";
                         $data = mysqli_query($conn, $query);
@@ -292,6 +299,7 @@
                                 <thead>
                                     <tr>
                                     <th scope="col">S.NO</th>
+                                    <th scope="col">Institution</th>
                                     <th scope="col">Requestor Name</th>
                                     <th scope="col">Requsted Role</th>
                                     <th scope="col">Requsted Venue</th>
@@ -306,6 +314,7 @@
                                     while($row = mysqli_fetch_assoc($data)){
                                         echo('<tr>
                                             <th scope="row">'.$count.'</th>
+                                            <td class="text-secondary">'.$institution_array[$row["institution_id"]].'</td>
                                             <td><span class="text-capitalize">'.$row["requestor_name"].'</span><br><span class="text-info">'.$row["requestor_email"].'<span></td>
                                             <td class="text-warning">'.$row["requestor_role"].'</td>
                                             <td class="text-capitalize text-info">'.$venue_array[$row["requestor_venue"]].'</td>');

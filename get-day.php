@@ -18,8 +18,8 @@
         }else{
             $row = mysqli_fetch_assoc($data);
             $result->count = $count;
-            $result->data->day_id = $row['day_id'];
-            $result->data->day_name = $row['day_value'];
+            $result->day_id = $row['day_id'];
+            $result->day_name = $row['day_value'];
         }
     }else{
         $result->Error="Internal server error occured!";

@@ -11,15 +11,6 @@ error_reporting(0);
             <li class="active" >
                 <a href="home.php">Home</a>
             </li>
-            <li>
-                <a href="about.php">About</a>
-            </li>
-            <li>
-                <a href="recipe.php">Recipe</a>
-            </li>
-            <li>
-                <a href="contact.php">Contact Us</a>
-            </li>
             <?php
                 if($_SESSION['email'] && $_SESSION['is_active']==1){
                     ?>

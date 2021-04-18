@@ -16,9 +16,14 @@
                         $_SESSION['name']=$result['name'];
                         $_SESSION['role']=$result['role'];
                         $_SESSION['venue']=$result['venue'];
-                        $_SESSION['designation']=$result['designation'];
                         $_SESSION['is_active']=$result['is_active'];
                         $_SESSION['is_blocked']=$result['is_blocked'];
+                        $_SESSION['institution_id']=$result['institution_id'];
+
+                        $q = "SELECT institution_name FROM institutions WHERE institution_id = '$_SESSION[institution_id]'";
+                        $d = mysqli_query($conn, $q);
+                        $r = mysqli_fetch_assoc($d);
+                        $_SESSION['institution_name'] = $r['institution_name'];
 
                         header("location:home.php");
                     }else{

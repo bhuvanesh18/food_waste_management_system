@@ -4,6 +4,7 @@ if(isset($_POST['register-submit'])){
     $useremail = $_POST['register-email'];
     $username = $_POST['register-name'];
     $userpassword = $_POST['register-password'];
+    $institution = $_POST['register-institution'];
     $userrole = $_POST['register-role'];
 
     if($userrole == "ADMIN"){
@@ -22,10 +23,10 @@ if(isset($_POST['register-submit'])){
             $query = "SELECT * FROM users WHERE email = '$useremail' LIMIT 1";
             $data = mysqli_query($conn, $query);
             if(mysqli_num_rows($data)==0){
-                $query = "INSERT INTO users (email, name, password, role, venue) VALUES ('$useremail', '$username', '$hashedpassword', '$userrole', '$uservenue')";
+                $query = "INSERT INTO users (email, name, password, role, venue, institution_id) VALUES ('$useremail', '$username', '$hashedpassword', '$userrole', '$uservenue','$institution')";
                 $data = mysqli_query($conn, $query);
                 if($data){
-                    echo("<script>
+                        echo("<script>
                             alert('Registeration successfull! Wait for admin approval!');
                             window.location='index.php';
                         </script>");

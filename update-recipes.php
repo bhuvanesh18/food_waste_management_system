@@ -101,6 +101,13 @@ $(document).ready(function(){
     while($venue_result = mysqli_fetch_assoc($venue_data)){
         $venue_array[$venue_result['venue_id']]= $venue_result['venue_name'];
     }
+
+    $institution_query = "SELECT institution_id, institution_name FROM institutions";
+    $institution_data = mysqli_query($conn, $institution_query);
+    $institution_array = [];
+    while($institution_result = mysqli_fetch_assoc($institution_data)){
+        $institution_array[$institution_result['institution_id']] = $institution_result['institution_name'];
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -310,11 +317,15 @@ $(document).ready(function(){
             </div>
             <!-- overall history -->
             <?php
-                if($_SESSION['role']=='SUPER_ADMIN'){
+                if($_SESSION['role']=='SUPER_ADMIN' || $_SESSION['role']=='ADMIN'){
                     ?>
                     <div class="tab-pane fade" id="recipes-history" role="tabpanel" aria-labelledby="recipes-history-tab">
                         <?php
-                        $overall_query = "SELECT recipe_info_and_history.*, users.name from users INNER JOIN (SELECT * FROM recipes INNER JOIN recipes_log_status ON recipes_log_status.recipe_id = recipes.id) as recipe_info_and_history ON recipe_info_and_history.action_by = users.email";
+                        if($_SESSION['role']=='SUPER_ADMIN'){
+                            $overall_query = "SELECT recipe_info_and_history.*, users.name from users INNER JOIN (SELECT * FROM recipes INNER JOIN recipes_log_status ON recipes_log_status.recipe_id = recipes.id) as recipe_info_and_history ON recipe_info_and_history.action_by = users.email";
+                        }else if($_SESSION['role']=='ADMIN'){
+                            $overall_query = "SELECT recipe_info_and_history.*, users.name from users INNER JOIN (SELECT * FROM recipes INNER JOIN recipes_log_status ON recipes_log_status.recipe_id = recipes.id WHERE institution_id = '$_SESSION[institution_id]' ) as recipe_info_and_history ON recipe_info_and_history.action_by = users.email";
+                        }
                         $overall_data = mysqli_query($conn,$overall_query);
                         if($overall_data){
                             $total_rows = mysqli_num_rows($overall_data);
@@ -326,6 +337,7 @@ $(document).ready(function(){
                                 <thead>
                                     <tr>
                                     <th scope="col">S.NO</th>
+                                    <th scope="col">Institution</th>
                                     <th scope="col">Venue</th>
                                     <th scope="col">Day</th>
                                     <th scope="col">Session</th>
@@ -342,6 +354,7 @@ $(document).ready(function(){
                                     while($row = mysqli_fetch_assoc($overall_data)){
                                         echo('<tr>
                                             <th scope="row" class="text-secondary">'.$count.'</th>
+                                            <td>'.$institution_array[$row["institution_id"]].'</td>
                                             <td>'.$venue_array[$row["venue"]].'</td>
                                             <td class="text-warning">'.$days_info_array[$row["day"]].'</td>
                                             <td>'.$row["session"].'</td>

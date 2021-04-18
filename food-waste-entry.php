@@ -16,12 +16,13 @@
         $waste_category = $_POST['category'];
         $selected_session = $_POST['session'];
         $waste_weight = $_POST['weight'];
+        $institution = $_SESSION['institution_id'];
 
         if($waste_category == "COOK_ITEM_WASTE"){
             $selected_item_id = $_POST['recipe'];
 
             if($selected_item_id!="" && $selected_day!="" && $selected_session!="" && $selected_venue!="" && $selected_date!="" && $waste_weight!="" && $user!=""){
-                $query = "SELECT IF(COUNT(recipe_id)=1,'YES','NO') as is_already_exist FROM cook_item_waste INNER JOIN (SELECT id FROM food_wastes WHERE date='$selected_date' AND day_id='$selected_day' AND session='$selected_session' AND venue='$selected_venue' AND waste_category='$waste_category') as cook_item_waste_on_date_session_venue ON cook_item_waste_on_date_session_venue.id = cook_item_waste.food_waste_id WHERE recipe_id = '$selected_item_id'";
+                $query = "SELECT IF(COUNT(recipe_id)=1,'YES','NO') as is_already_exist FROM cook_item_waste INNER JOIN (SELECT id FROM food_wastes WHERE date='$selected_date' AND day_id='$selected_day' AND session='$selected_session' AND venue='$selected_venue' AND institution_id = '$institution' AND waste_category='$waste_category') as cook_item_waste_on_date_session_venue ON cook_item_waste_on_date_session_venue.id = cook_item_waste.food_waste_id WHERE recipe_id = '$selected_item_id'";
                 $data = mysqli_query($conn, $query);
                 $result = mysqli_fetch_assoc($data);
                 if($result['is_already_exist']=="NO"){
@@ -29,8 +30,8 @@
 
                     $waste_weight = number_format(floor($waste_weight*100)/100,2, '.', '');
 
-                    $query = "INSERT INTO food_wastes(venue, date, day_id, session, waste_category, weight, entry_by) 
-                    VALUES('$selected_venue','$selected_date','$selected_day','$selected_session', '$waste_category','$waste_weight','$user')";
+                    $query = "INSERT INTO food_wastes(venue, date, day_id, session, waste_category, weight, entry_by, institution_id) 
+                    VALUES('$selected_venue','$selected_date','$selected_day','$selected_session', '$waste_category','$waste_weight','$user','$institution')";
                     $data = mysqli_query($conn, $query);
                     if($data){
                         $waste_id = mysqli_insert_id($conn);
@@ -75,15 +76,15 @@
         }else{
 
             if($selected_day!="" && $selected_session!="" && $selected_venue!="" && $selected_date!="" && $waste_weight!="" && $user!=""){
-                $query = "SELECT * FROM food_wastes WHERE date='$selected_date' AND day_id='$selected_day' AND session='$selected_session' AND venue='$selected_venue' AND waste_category='$waste_category'";
+                $query = "SELECT * FROM food_wastes WHERE date='$selected_date' AND day_id='$selected_day' AND session='$selected_session' AND venue='$selected_venue' AND waste_category='$waste_category' AND institution_id = '$institution'";
                 $data = mysqli_query($conn, $query);
                 if(mysqli_num_rows($data)==0){
                     if(is_numeric($waste_weight)){
 
                         $waste_weight = number_format(floor($waste_weight*100)/100,2, '.', '');
 
-                        $query = "INSERT INTO food_wastes(venue, date, day_id, session, waste_category, weight, entry_by) 
-                        VALUES('$selected_venue','$selected_date','$selected_day','$selected_session', '$waste_category','$waste_weight','$user')";
+                        $query = "INSERT INTO food_wastes(venue, date, day_id, session, waste_category, weight, entry_by, institution_id) 
+                        VALUES('$selected_venue','$selected_date','$selected_day','$selected_session', '$waste_category','$waste_weight','$user','$institution')";
                         $data = mysqli_query($conn, $query);
                         if($data){
                             echo("<script>

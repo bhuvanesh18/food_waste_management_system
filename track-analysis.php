@@ -49,7 +49,7 @@ while($venue_result = mysqli_fetch_assoc($venue_data)){
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <a class="nav-link active" id="analysis-report-tab" data-bs-toggle="tab" href="#analysis-report" role="tab" aria-controls="analysis-report" aria-selected="true">Analysis report</a>
-                <a class="nav-link" id="cook-items-analysis-report-tab" data-bs-toggle="tab" href="#cook-items-analysis-report" role="tab" aria-controls="cook-items-analysis-report" aria-selected="false">Analysis report</a>
+                <a class="nav-link" id="cook-items-analysis-report-tab" data-bs-toggle="tab" href="#cook-items-analysis-report" role="tab" aria-controls="cook-items-analysis-report" aria-selected="false">Cook item waste report</a>
             </div>
         </nav>
         <div class="tab-content mt-4" id="nav-tabContent">
@@ -109,7 +109,7 @@ while($venue_result = mysqli_fetch_assoc($venue_data)){
                         ,SUM(CASE WHEN session = 'lunch' THEN weight END) AS 'lunch_waste'
                         ,SUM(CASE WHEN session = 'snacks' THEN weight END) AS 'snacks_waste'
                         ,SUM(CASE WHEN session = 'dinner' THEN weight END) AS 'dinner_waste'
-                        FROM food_wastes WHERE date BETWEEN '$starting_date' AND '$ending_date' AND venue='$selected_venue' AND waste_category='FOOD_WASTE' GROUP BY day_id) as food_waste_result_table ON food_waste_result_table.day_id = days_info.day_id WHERE is_available=1 ORDER BY day_order ASC
+                        FROM food_wastes WHERE date BETWEEN '$starting_date' AND '$ending_date' AND venue='$selected_venue' AND waste_category='FOOD_WASTE' AND institution_id = '$_SESSION[institution_id]' GROUP BY day_id) as food_waste_result_table ON food_waste_result_table.day_id = days_info.day_id WHERE is_available=1 ORDER BY day_order ASC
                         ";
                         $food_waste_data = mysqli_query($conn,$food_waste_query);
 
@@ -132,7 +132,7 @@ while($venue_result = mysqli_fetch_assoc($venue_data)){
                         ,SUM(CASE WHEN session = 'lunch' THEN weight END) AS 'lunch_waste'
                         ,SUM(CASE WHEN session = 'snacks' THEN weight END) AS 'snacks_waste'
                         ,SUM(CASE WHEN session = 'dinner' THEN weight END) AS 'dinner_waste'
-                        FROM food_wastes WHERE date BETWEEN '$starting_date' AND '$ending_date' AND venue='$selected_venue' AND waste_category='COOK_WASTE' GROUP BY day_id) as food_waste_result_table ON food_waste_result_table.day_id = days_info.day_id WHERE is_available=1 ORDER BY day_order ASC
+                        FROM food_wastes WHERE date BETWEEN '$starting_date' AND '$ending_date' AND venue='$selected_venue' AND waste_category='COOK_WASTE' AND institution_id = '$_SESSION[institution_id]' GROUP BY day_id) as food_waste_result_table ON food_waste_result_table.day_id = days_info.day_id WHERE is_available=1 ORDER BY day_order ASC
                         ";
                         $cook_waste_data = mysqli_query($conn,$cook_waste_query);
 
@@ -155,7 +155,7 @@ while($venue_result = mysqli_fetch_assoc($venue_data)){
                         ,SUM(CASE WHEN session = 'lunch' THEN weight END) AS 'lunch_waste'
                         ,SUM(CASE WHEN session = 'snacks' THEN weight END) AS 'snacks_waste'
                         ,SUM(CASE WHEN session = 'dinner' THEN weight END) AS 'dinner_waste'
-                        FROM food_wastes WHERE date BETWEEN '$starting_date' AND '$ending_date' AND venue='$selected_venue' AND waste_category='COOK_ITEM_WASTE' GROUP BY day_id) as food_waste_result_table ON food_waste_result_table.day_id = days_info.day_id WHERE is_available=1 ORDER BY day_order ASC
+                        FROM food_wastes WHERE date BETWEEN '$starting_date' AND '$ending_date' AND venue='$selected_venue' AND waste_category='COOK_ITEM_WASTE' AND institution_id = '$_SESSION[institution_id]' GROUP BY day_id) as food_waste_result_table ON food_waste_result_table.day_id = days_info.day_id WHERE is_available=1 ORDER BY day_order ASC
                         ";
                         $cook_item_waste_data = mysqli_query($conn,$cook_item_waste_query);
 
@@ -172,7 +172,8 @@ while($venue_result = mysqli_fetch_assoc($venue_data)){
                                 <div class="my-4">
                                     <div class="text-center">
                                         <p id="venue_info_for_export" class="display-6 text-capitalize">Venue: <?php echo($venue_array[$selected_venue]);?></p>
-                                        <p id="report_dates_info_for_export" class="display-6"><?php echo(getDateFormat($starting_date)." to ".getDateFormat($ending_date));?></p>
+                                        <p id="report_dates_info_for_export" class="display-6 text-info"><?php echo(getDateFormat($starting_date)." to ".getDateFormat($ending_date));?></p>
+                                        <p id="institution_for_export" class="display-6 text-secondary"><?php echo($_SESSION['institution_name']);?></p>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-end">
@@ -612,7 +613,100 @@ while($venue_result = mysqli_fetch_assoc($venue_data)){
             </div>
             <!-- cook items analysis report tab-->
             <div class="tab-pane fade" id="cook-items-analysis-report" role="tabpanel" aria-labelledby="cook-items-analysis-report-tab">
-                cook-items-analysis report
+                <form class="row row-cols-lg-auto g-2 align-items-center" method="POST">
+                    <?php
+                        if($_SESSION['venue']=="ALL"){
+                            ?>
+                            <div class="col-12">
+                                <select class="form-select text-capitalize" id="venue" name="cook-item-report-venue">
+                                    <?php
+                                        $query = "SELECT * FROM venue_info WHERE is_venue_available=1";
+                                        $data = mysqli_query($conn, $query);
+                                        while($result = mysqli_fetch_assoc($data)){
+                                            echo('<option class="text-capitalize" value="'.$result['venue_id'].'">'.$result["venue_name"].'</option>');
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                        <?php
+                        }else{
+                            echo('<input type="hidden" id="venue" name="cook-item-report-venue" value="'.$_SESSION["venue"].'" readonly />'); 
+                        }
+                    ?>
+                    <div class="col-12">
+                        <label for="cook-item-report-starting-date">Starting date</label>
+                        <input type="date" class="form-control" id="cook-item-report-starting-date" name="cook-item-report-starting-date" required/>
+                    </div>
+                    <div class="col-12">
+                        <label for="cook-item-report-ending-date">Ending date</label>
+                        <input type="date" class="form-control" id="cook-item-report-ending-date" name="cook-item-report-ending-date" required/>
+                    </div>
+                    <div class="col-12">
+                        <input type="submit" id="cook-item-report-generate" name="cook-item-report-generate" class="btn btn-primary" value="Generate" />
+                    </div>
+                </form>
+
+                <?php
+                    if(isset($_POST['cook-item-report-generate'])){
+                        $starting_date = $_POST['cook-item-report-starting-date'];
+                        $ending_date = $_POST['cook-item-report-ending-date'];
+                        $input_venue = $_POST['cook-item-report-venue'];
+
+                        $query = "
+                        SELECT day,session,venue, recipe_name,weight, IF(is_active=1,'In Use','Not In Use') as is_in_use, institution_id FROM recipes
+                        INNER JOIN (
+                           SELECT cook_item_waste.recipe_id, SUM(cook_item_waste_fetched_table.weight) as weight FROM cook_item_waste
+                            INNER JOIN (
+                                SELECT * FROM food_wastes WHERE date BETWEEN '$starting_date' AND '$ending_date' AND waste_category='COOK_ITEM_WASTE' AND venue='$input_venue' AND institution_id = '$_SESSION[institution_id]'
+                               ) as cook_item_waste_fetched_table ON cook_item_waste_fetched_table.id = cook_item_waste.food_waste_id
+                                GROUP BY cook_item_waste.recipe_id HAVING SUM(cook_item_waste_fetched_table.weight) >= 0
+                           ) as cook_item_waste_fetched_table_with_weight ON cook_item_waste_fetched_table_with_weight.recipe_id = recipes.id";
+                           $data = mysqli_query($conn, $query);
+                           if(mysqli_num_rows($data)>0){
+                               ?>
+
+                            <div class="my-4">
+                                <div class="text-center">
+                                    <p id="venue_info_for_export" class="display-6 text-capitalize">Venue: <?php echo($venue_array[$input_venue]);?></p>
+                                    <p id="report_dates_info_for_export" class="display-6 text-info"><?php echo(getDateFormat($starting_date)." to ".getDateFormat($ending_date));?></p>
+                                    <p id="institution_name_for_export" class="display-6 text-secondary"><?php echo($_SESSION['institution_name']);?></p>
+                                </div>
+                            </div>
+                            <?php
+                                echo('<table  class="table table-dark table-striped text-capitalize text-center">
+                                <thead>    
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Institution<th>
+                                        <th>Day</th>
+                                        <th>Session</th>
+                                        <th>Venue</th>
+                                        <th>Recipe name</th>
+                                        <th>Total waste weight</th>
+                                        <th>Usage</th>
+                                    </tr>
+                                </thead><tbody>');
+                                $count=1;
+                                while($result = mysqli_fetch_assoc($data)){
+                                    echo('
+                                    <tr>
+                                        <td>'.$count.'</td>
+                                        <td class="text-info">'.$institution_array[$result['institution_id']].'</td>
+                                        <td class="text-info">'.$days_info_array[$result['day']].'</td>
+                                        <td class="text-warning">'.$result['session'].'</td>
+                                        <td>'.$venue_array[$result['venue']].'</td>
+                                        <td class="text-info">'.$result['recipe_name'].'</td>
+                                        <td>'.$result['weight'].'</td>
+                                        <td>'.$result['is_in_use'].'</td>
+                                    </tr>');
+                                    $count++;
+                                }
+                                echo("</tbody></table>");
+                        }else{
+                            echo("No entry found");
+                        }
+                    }
+                ?>
             </div>
         </div>
     </div>

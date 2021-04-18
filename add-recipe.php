@@ -15,6 +15,8 @@
         $selected_session = $_POST['day-session'];
         $recipe_name = $_POST['recipe-name'];
         $recipe_image = $_FILES['recipe-image'];
+        $institution = $_SESSION['institution_id'];
+
         if($selected_day!="" && $selected_session!="" && $recipe_name!="" && $recipe_image!="" && $selected_venue!=""){
             $fileName = $_FILES['recipe-image']['name'];
             $fileTmpname = $_FILES['recipe-image']['tmp_name'];
@@ -42,7 +44,7 @@
                         $r = mysqli_fetch_assoc($d);
 
                         if($result['max_recipe_count'] > $r['already_available_recipe_count']){
-                            $query = "INSERT INTO recipes(day,session,recipe_name,recipe_image_path,venue) VALUES ('$selected_day','$selected_session','$recipe_name','$fileDestination','$selected_venue')";
+                            $query = "INSERT INTO recipes(day,session,recipe_name,recipe_image_path,venue,institution_id) VALUES ('$selected_day','$selected_session','$recipe_name','$fileDestination','$selected_venue','$institution')";
                             $data = mysqli_query($conn, $query);
                             if($data){
                                 // it gives last inserted id

@@ -1,5 +1,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
+    // for getting venues list
     $(document).ready(function(){
         $venue_selector = `<div>
                         <label for="register-venue" class="form-label">Venue</label>
@@ -18,6 +19,29 @@
             } 
         });
     });
+</script>
+<script>
+    //for getting the registered college institutions
+    $(document).ready(function(){
+    var GetURL = "get-registered-college-institutions.php";
+    $.get(GetURL, function(data, status){
+      var JSONData = JSON.parse(data);
+      if(JSONData.hasOwnProperty('Error')){
+          alert(JSONData.Error);
+      }else{
+        if(JSONData.count==0){
+            alert("No institutions available!");
+        }else{
+            var n=JSONData.ids.length;
+            var i=0;
+            while(i<n){
+                $('#institutions').append(`<option class="text-capitalize" value='${JSONData.ids[i]}'>${JSONData.names[i]}</option>`);
+                i++;
+            }
+        }
+      }
+  });
+});
 </script>
 <!-- login modal -->
 <div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -74,6 +98,12 @@
                 <div class="mb-3">
                     <label for="register-repassword" class="form-label">Re-type Password</label>
                     <input type="password" class="form-control" name="register-repassword" id="register-repassword" placeholder="Confrim your password" minlength="6" required>
+                </div>
+                <div class="mb-3">
+                    <label for="institutions" class="form-label">Institution</label>
+                    <select class="form-select" name="register-institution" id="institutions" required>
+                        <option value="" selected>Select your institution</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="register-role" class="form-label">Role</label>

@@ -27,19 +27,20 @@
         <!-- header -->
         <?php
         include_once('navBar.php');
-        echo('<h2>Hi '.$_SESSION['name'].'</h2>');
+        echo('<h2>Hi <span class="display-6 text-secondary">'.$_SESSION['name'].'</span></h2>');
+        echo('<h2>Institution Name: <span class="text-primary">'.$_SESSION["institution_name"].'</span></h2>');
 
         switch ($_SESSION['is_active']) {
             case 0:
-                $status = "Your account not yet activated.";
+                $status = "Inactive";
                 $color = "text-danger";
                 break;
             case 1:
-                $status = "Your account activated.";
+                $status = "Active";
                 $color = "text-success";
                 break;
         }
-        echo('<h4>Your Status - <span class="'.$color.'">'.$status.'</span></h4>');
+        echo('<h2>Account status - <span class="display-6 '.$color.'">'.$status.'</span></h2>');
         ?>
         </div>
     </div>
